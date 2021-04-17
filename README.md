@@ -23,11 +23,13 @@ Example config:
 ```
 type: 'custom:notify-card'
 target: living_room_tv
+title: Send Notification
 label: Notify TV
 ```
 
-- `label` is optional and controlls the placeholder text
 - `target` is the name of the notify-service that should get called without the `notify.` domain. (For `notify.notify` put in `notify`, for `notify.telegram` put in `telegram`, etc.)
+- `label` is optional and controlls the placeholder text
+- `title` is optional and controlles the card title
 
 You can also specify multiple notification services like this:
 
