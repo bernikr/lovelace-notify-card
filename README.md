@@ -1,6 +1,8 @@
 # Notify Card for Lovelace/Home Assistant
 This simple card allows you to notify any notification service manually from the dashboard.
 
+![card](card.jpg)
+
 ## Install
 ### Install via HACS
 1. Click `Custom Repository` in the upper right menu
