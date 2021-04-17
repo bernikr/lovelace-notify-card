@@ -16,12 +16,13 @@ class NotifyCard extends HTMLElement {
 
   render() {
     if (!this.content) {
-      const card = document.createElement('ha-card');
+      this.card = document.createElement('ha-card');
       this.content = document.createElement('div');
-      this.content.style.padding = '16px 16px';
-      card.appendChild(this.content);
-      this.appendChild(card);
+      this.content.style.padding = '0 16px 16px';
+      this.card.appendChild(this.content);
+      this.appendChild(this.card);
     }
+    this.card.header = this.config.title || "Send Notification";
     let label = this.config.label || "Notification Text"
     this.content.innerHTML = `
       <div style="display: flex">
