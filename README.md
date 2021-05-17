@@ -5,9 +5,10 @@ This simple card allows you to notify any notification service manually from the
 
 ## Install
 ### Install via HACS
-1. Click `Custom Repository` in the upper right menu
-2. Enter `bernikr/lovelace-notify-card` and select `Lovelace` as category
-3. Click install
+1. Go to the "Frontend"-tab in HACS
+2. Click on "Explore & Add Repositories"
+3. Search for `Notify Card`
+5. Click "Install this Repository in HACS"
 
 ### Manual install
 1. Copy the `notify-card.js` file to your `config/www` folder
