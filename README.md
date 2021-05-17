@@ -42,3 +42,11 @@ target:
 - living_room_tv
 - notify
 ```
+
+If your notification service requires additional data (e.g. Alexa) you can include it like this:
+```
+type: 'custom:notify-card'
+target: alexa_media_living_room
+data:
+  type: announce
+```
