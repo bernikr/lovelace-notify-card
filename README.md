@@ -30,7 +30,7 @@ title: Send Notification
 label: Notify TV
 ```
 
-- `target` is the name of the notify-service that should get called without the `notify.` domain. (For `notify.notify` put in `notify`, for `notify.telegram` put in `telegram`, etc.)
+- `target` is the name of the notify-service that should get called without the `notify.` domain. (For `notify.notify` put in `notify`, for `notify.telegram` put in `telegram`, etc. If your service is not under the `notify.` domain, use the full service name, example: `script.notify_tv`)
 - `label` is optional and controlls the placeholder text
 - `title` is optional and controlles the card title
 
