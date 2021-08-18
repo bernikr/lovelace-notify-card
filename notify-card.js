@@ -32,6 +32,7 @@ class NotifyCard extends HTMLElement {
       </div>
     `;
     this.content.querySelector("ha-icon-button").addEventListener("click", this.send.bind(this), false);
+    this.content.querySelector("paper-input").addEventListener("keydown", this.keydown.bind(this), false);
   }
 
   send(){
@@ -45,6 +46,10 @@ class NotifyCard extends HTMLElement {
       this.hass.callService(domain, target, {message: msg, data: this.config.data});
     }
     this.content.querySelector("paper-input").value = "";
+  }
+
+  keydown(e){
+    if(e.code == "Enter") this.send();
   }
 }
 
