@@ -1,6 +1,6 @@
 # Notify Card for Lovelace/Home Assistant
 
-[!["Buy Me A Coffee"](https://img.shields.io/static/v1?label=buy%20me%20a&message=coffe&color=FFDD00&logo=buymeacoffee&style=flat-square)](https://buymeacoffee.com/bernikr)
+[!["Buy Me A Coffee"](https://img.shields.io/static/v1?label=donate&message=buymeacoffe&color=FFDD00&logo=buymeacoffee&style=flat-square)](https://buymeacoffee.com/bernikr)
 [!["Chat on Telegram"](https://img.shields.io/static/v1?label=chat&message=Telegram&color=26A5E4&logo=telegram&style=flat-square)](https://t.me/bernikr)
 
 This simple card allows you to notify any notification service manually from the dashboard.
