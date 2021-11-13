@@ -30,13 +30,15 @@ Example config:
 ```
 type: 'custom:notify-card'
 target: living_room_tv
-title: Send Notification
 label: Notify TV
+card_title: Send Notification
+notification_title: 'New Notification'
 ```
 
 - `target` is the name of the notify-service that should get called without the `notify.` domain. (For `notify.notify` put in `notify`, for `notify.telegram` put in `telegram`, etc. If your service is not under the `notify.` domain, use the full service name, example: `script.notify_tv`)
 - `label` is optional and controlls the placeholder text
-- `title` is optional and controlles the card title
+- `card_title` is optional and controlles the card title
+- `notification_title` is optional and is the title that gets sent with the notification
 
 You can also specify multiple notification services like this:
 
@@ -45,6 +47,22 @@ type: 'custom:notify-card'
 target:
 - living_room_tv
 - notify
+```
+
+If you want a textfield to set the notification title with every message you can configure it like this:
+```
+type: 'custom:notify-card'
+target: living_room_tv
+notification_title:
+  input:
+```
+
+If you want to change the label of the title textfield you can do that in the input parameter:
+```
+type: 'custom:notify-card'
+target: living_room_tv
+notification_ title:
+  input: 'Put Title here'
 ```
 
 If your notification service requires additional data (e.g. Alexa) you can include it like this:
