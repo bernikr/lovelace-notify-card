@@ -22,32 +22,44 @@ class NotifyCard extends HTMLElement {
       this.card.appendChild(this.content);
       this.appendChild(this.card);
     }
-    this.card.header = this.config.title || "Send Notification";
-    let label = this.config.label || "Notification Text"
-    this.content.innerHTML = `
+    this.card.header = this.config.card_title ?? "Send Notification";
+    this.content.innerHTML = "";
+
+    if(this.config.notification_title instanceof Object){
+      let title_label = this.config.notification_title.input ?? "Notification Title"
+      this.content.innerHTML += `
       <div style="display: flex">
-        <paper-input style="flex-grow: 1" label="${label}">
-          <ha-icon-button slot="suffix">
-            <ha-icon icon="mdi:send">
-          </ha-icon-button>
-        </paper-input>
+        <paper-input id="notification_title" style="flex-grow: 1" label="${title_label}"/>
       </div>
+      `
+    }
+    
+    let label = this.config.label ?? "Notification Text";
+    this.content.innerHTML += `
+    <div style="display: flex">   
+      <paper-input id="notification_text" style="flex-grow: 1" label="${label}">
+        <ha-icon-button id="send_button" slot="suffix">
+          <ha-icon icon="mdi:send">
+        </ha-icon-button>
+      </paper-input>
+    </div>
     `;
-    this.content.querySelector("ha-icon-button").addEventListener("click", this.send.bind(this), false);
-    this.content.querySelector("paper-input").addEventListener("keydown", this.keydown.bind(this), false);
+    this.content.querySelector("#send_button").addEventListener("click", this.send.bind(this), false);
+    this.content.querySelector("#notification_text").addEventListener("keydown", this.keydown.bind(this), false);
   }
 
   send(){
-    let msg = this.content.querySelector("paper-input").value;
+    let msg = this.content.querySelector("#notification_text").value;
+    let title = this.content.querySelector("#notification_title")?.value ?? this.config.notification_title;
     for (let t of this.targets) {
       let [domain, target = null] = t.split(".");
       if(target === null){
         target = domain;
         domain = "notify";
       }
-      this.hass.callService(domain, target, {message: msg, data: this.config.data});
+      this.hass.callService(domain, target, {message: msg, title: title, data: this.config.data});
     }
-    this.content.querySelector("paper-input").value = "";
+    this.content.querySelectorAll("paper-input").forEach(e => e.value = "");
   }
 
   keydown(e){
