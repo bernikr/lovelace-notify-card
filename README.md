@@ -72,3 +72,11 @@ target: alexa_media_living_room
 data:
   type: announce
 ```
+
+If your want to use `tts.google_translate_say`, include an entity like this:
+```
+type: 'custom:notify-card'
+target: tts.google_translate_say
+entity: media_player.google_nest_mini
+```
+
