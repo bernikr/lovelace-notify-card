@@ -37,7 +37,7 @@ class NotifyCard extends HTMLElement {
     let label = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
     <div style="display: flex">   
-      <paper-input id="notification_text" style="flex-grow: 1" label="${label}">
+      <paper-input no-label-float id="notification_text" style="flex-grow: 1" label="${label}">
         <ha-icon-button id="send_button" slot="suffix">
           <ha-icon icon="mdi:send">
         </ha-icon-button>
@@ -58,7 +58,7 @@ class NotifyCard extends HTMLElement {
         domain = "notify";
       }
       if(domain === "tts"){
-        this.hass.callService(domain, target, {"entity_id": this.config.entity, "message": msg});
+        this.hass.callService(domain, target, {...{"entity_id": this.config.entity, "message": msg}, ...this.config.data});
       } else {
         this.hass.callService(domain, target, {message: msg, title: title, data: this.config.data});
       }
