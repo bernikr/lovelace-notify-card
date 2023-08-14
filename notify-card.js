@@ -58,7 +58,7 @@ class NotifyCard extends HTMLElement {
         domain = "notify";
       }
       if(domain === "tts"){
-        this.hass.callService(domain, target, {"entity_id": this.config.entity, "message": msg});
+        this.hass.callService(domain, target, {...{"entity_id": this.config.entity, "message": msg}, ...this.config.data});
       } else {
         this.hass.callService(domain, target, {message: msg, title: title, data: this.config.data});
       }
