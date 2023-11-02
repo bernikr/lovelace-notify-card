@@ -29,7 +29,7 @@ class NotifyCard extends HTMLElement {
       let title_label = this.config.notification_title.input ?? "Notification Title"
       this.content.innerHTML += `
       <div style="display: flex">
-        <paper-input id="notification_title" style="flex-grow: 1" label="${title_label}"/>
+        <ha-textfield id="notification_title" style="flex-grow: 1" label="${title_label}"/>
       </div>
       `
     }
@@ -37,11 +37,10 @@ class NotifyCard extends HTMLElement {
     let label = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
     <div style="display: flex">   
-      <paper-input id="notification_text" style="flex-grow: 1" label="${label}">
-        <ha-icon-button id="send_button" slot="suffix">
+      <ha-textfield id="notification_text" style="flex-grow: 1" label="${label}"></ha-textfield>
+      <ha-icon-button id="send_button" slot="suffix">
           <ha-icon icon="mdi:send">
-        </ha-icon-button>
-      </paper-input>
+      </ha-icon-button>
     </div>
     `;
     this.content.querySelector("#send_button").addEventListener("click", this.send.bind(this), false);
@@ -63,7 +62,7 @@ class NotifyCard extends HTMLElement {
         this.hass.callService(domain, target, {message: msg, title: title, data: this.config.data});
       }
     }
-    this.content.querySelectorAll("paper-input").forEach(e => e.value = "");
+    this.content.querySelectorAll("ha-textfield").forEach(e => e.value = "");
   }
 
   keydown(e){
