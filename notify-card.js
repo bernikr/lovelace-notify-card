@@ -37,11 +37,10 @@ class NotifyCard extends HTMLElement {
     let label = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
     <div style="display: flex">   
-      <ha-textfield id="notification_text" style="flex-grow: 1" label="${label}">
-        <ha-icon-button id="send_button" slot="suffix">
+      <ha-textfield id="notification_text" style="flex-grow: 1" label="${label}"></ha-textfield>
+      <ha-icon-button id="send_button" slot="suffix">
           <ha-icon icon="mdi:send">
-        </ha-icon-button>
-      </ha-textfield>
+      </ha-icon-button>
     </div>
     `;
     this.content.querySelector("#send_button").addEventListener("click", this.send.bind(this), false);
