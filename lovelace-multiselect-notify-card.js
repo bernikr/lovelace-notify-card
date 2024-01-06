@@ -24,17 +24,17 @@ class NotifyCard extends HTMLElement {
         const label = targetObj.label; // Access the label
 
         const container = document.createElement('div');
-        const radioInput = document.createElement('input');
-        radioInput.type = 'radio';
-        radioInput.id = target;
-        radioInput.name = 'notification_target';
-        radioInput.value = target;
+        const checkboxInput = document.createElement('input');
+        checkboxInput.type = 'checkbox';
+        checkboxInput.id = target;
+        checkboxInput.name = 'notification_target';
+        checkboxInput.value = target;
 
         const labelElement = document.createElement('label');
         labelElement.htmlFor = target;
         labelElement.textContent = label || target; // Use the label, fallback to entity ID
 
-        container.appendChild(radioInput);
+        container.appendChild(checkboxInput);
         container.appendChild(labelElement);
         this.content.appendChild(container);
     });
@@ -53,11 +53,13 @@ class NotifyCard extends HTMLElement {
   send() {
     let msg = this.content.querySelector("#notification_text").value;
     let title = this.config.notification_title ?? "Home Assistant Notification";
-    let selectedTarget = this.content.querySelector('input[name="notification_target"]:checked').value;
+    let selectedTargets = Array.from(this.content.querySelectorAll('input[name="notification_target"]:checked')).map(checkbox => checkbox.value);
     
-    this.hass.callService('notify', selectedTarget, {
-        message: msg,
-        title: title
+    selectedTargets.forEach(target => {
+      this.hass.callService('notify', target, {
+          message: msg,
+          title: title
+      });
     });
 
     this.content.querySelector("#notification_text").value = "";
