@@ -1,7 +1,7 @@
 class NotifyCard extends HTMLElement {
   setConfig(config) {
     if (!config.targets) {
-      throw new Error('You need to define a list of targets');
+      throw new Error('You need to define targets with labels');
     }
     this.config = config;
     this.targets = this.config.targets;
@@ -19,9 +19,10 @@ class NotifyCard extends HTMLElement {
     this.card.header = this.config.card_title ?? "Send Notification";
     this.content.innerHTML = "";
 
-    // Removing the existing select element code
-    // and replacing it with radio button creation
-    this.targets.forEach(target => {
+    this.targets.forEach(targetObj => {
+        const target = targetObj.entity; // Access the entity ID
+        const label = targetObj.label; // Access the label
+
         const container = document.createElement('div');
         const radioInput = document.createElement('input');
         radioInput.type = 'radio';
@@ -29,19 +30,19 @@ class NotifyCard extends HTMLElement {
         radioInput.name = 'notification_target';
         radioInput.value = target;
 
-        const label = document.createElement('label');
-        label.htmlFor = target;
-        label.textContent = target; // You can customize this label
+        const labelElement = document.createElement('label');
+        labelElement.htmlFor = target;
+        labelElement.textContent = label || target; // Use the label, fallback to entity ID
 
         container.appendChild(radioInput);
-        container.appendChild(label);
+        container.appendChild(labelElement);
         this.content.appendChild(container);
     });
 
-    let label = this.config.label ?? "Notification Text";
+    let labelText = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
     <div style="display: flex">   
-      <textarea id="notification_text" style="flex-grow: 1" placeholder="${label}"></textarea>
+      <textarea id="notification_text" style="flex-grow: 1" placeholder="${labelText}"></textarea>
       <button id="send_button">Send</button>
     </div>
     `;
@@ -54,7 +55,6 @@ class NotifyCard extends HTMLElement {
     let title = this.config.notification_title ?? "Home Assistant Notification";
     let selectedTarget = this.content.querySelector('input[name="notification_target"]:checked').value;
     
-    // Single target selected by radio button
     this.hass.callService('notify', selectedTarget, {
         message: msg,
         title: title
