@@ -1,4 +1,3 @@
-
 class NotifyCard extends HTMLElement {
   setConfig(config) {
     if (!config.targets) {
@@ -20,16 +19,24 @@ class NotifyCard extends HTMLElement {
     this.card.header = this.config.card_title ?? "Send Notification";
     this.content.innerHTML = "";
 
-    const targetsSelect = document.createElement('select');
-    targetsSelect.multiple = true;
+    // Removing the existing select element code
+    // and replacing it with radio button creation
     this.targets.forEach(target => {
-      const option = document.createElement('option');
-      option.value = target;
-      option.text = target;
-      targetsSelect.appendChild(option);
-    });
+        const container = document.createElement('div');
+        const radioInput = document.createElement('input');
+        radioInput.type = 'radio';
+        radioInput.id = target;
+        radioInput.name = 'notification_target';
+        radioInput.value = target;
 
-    this.content.appendChild(targetsSelect);
+        const label = document.createElement('label');
+        label.htmlFor = target;
+        label.textContent = target; // You can customize this label
+
+        container.appendChild(radioInput);
+        container.appendChild(label);
+        this.content.appendChild(container);
+    });
 
     let label = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
@@ -45,14 +52,14 @@ class NotifyCard extends HTMLElement {
   send() {
     let msg = this.content.querySelector("#notification_text").value;
     let title = this.config.notification_title ?? "Home Assistant Notification";
-    let selectedTargets = Array.from(this.content.querySelector('select').selectedOptions).map(opt => opt.value);
+    let selectedTarget = this.content.querySelector('input[name="notification_target"]:checked').value;
     
-    for (let target of selectedTargets) {
-      this.hass.callService('notify', target, {
+    // Single target selected by radio button
+    this.hass.callService('notify', selectedTarget, {
         message: msg,
         title: title
-      });
-    }
+    });
+
     this.content.querySelector("#notification_text").value = "";
   }
 
