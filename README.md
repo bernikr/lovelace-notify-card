@@ -15,12 +15,12 @@ This simple card allows you to notify any notification service manually from the
 5. Click "Install this Repository in HACS"
 
 ### Manual install
-1. Copy the `notify-card.js` file to your `config/www` folder
+1. Copy the `lovelace-multiselect-notify-card.js` file to your `config/www` folder
 2. Add a reference in the resoruce config:
 
 ```
 resources:
-  - url: /local/notify-card.js
+  - url: /local/lovelace-multiselect-notify-card.js
     type: module
 ```
 
@@ -28,7 +28,7 @@ resources:
 Example config:
 
 ```
-type: 'custom:notify-card'
+type: 'custom:lovelace-multiselect-notify-card'
 target: living_room_tv
 label: Notify TV
 card_title: Send Notification
@@ -43,7 +43,7 @@ notification_title: 'New Notification'
 You can also specify multiple notification services like this:
 
 ```
-type: 'custom:notify-card'
+type: 'custom:lovelace-multiselect-notify-card'
 target:
 - living_room_tv
 - notify
@@ -51,7 +51,7 @@ target:
 
 If you want a textfield to set the notification title with every message you can configure it like this:
 ```
-type: 'custom:notify-card'
+type: 'custom:lovelace-multiselect-notify-card'
 target: living_room_tv
 notification_title:
   input:
@@ -59,7 +59,7 @@ notification_title:
 
 If you want to change the label of the title textfield you can do that in the input parameter:
 ```
-type: 'custom:notify-card'
+type: 'custom:lovelace-multiselect-notify-card'
 target: living_room_tv
 notification_ title:
   input: 'Put Title here'
@@ -67,7 +67,7 @@ notification_ title:
 
 If your notification service requires additional data (e.g. Alexa) you can include it like this:
 ```
-type: 'custom:notify-card'
+type: 'custom:lovelace-multiselect-notify-card'
 target: alexa_media_living_room
 data:
   type: announce
@@ -75,7 +75,7 @@ data:
 
 If your want to use `tts.google_translate_say`, include an entity like this:
 ```
-type: 'custom:notify-card'
+type: 'custom:lovelace-multiselect-notify-card'
 target: tts.google_translate_say
 entity: media_player.google_nest_mini
 ```
