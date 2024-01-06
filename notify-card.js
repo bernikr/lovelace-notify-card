@@ -1,16 +1,10 @@
 class NotifyCard extends HTMLElement {
   setConfig(config) {
-    if (!config.target) {
-      throw new Error('You need to define one or more targets');
+    if (!config.targets) {
+      throw new Error('You need to define a list of targets');
     }
     this.config = config;
-    if (typeof this.config.target == "string") {
-      this.targets = [this.config.target];
-    } else if (Array.isArray(this.config.target)) {
-      this.targets = this.config.target
-    } else {
-      throw new Error('Target needs to be a list or single target');
-    }
+    this.targets = this.config.targets;
     this.render();
   }
 
@@ -25,48 +19,46 @@ class NotifyCard extends HTMLElement {
     this.card.header = this.config.card_title ?? "Send Notification";
     this.content.innerHTML = "";
 
-    if(this.config.notification_title instanceof Object){
-      let title_label = this.config.notification_title.input ?? "Notification Title"
-      this.content.innerHTML += `
-      <div style="display: flex">
-        <ha-textfield id="notification_title" style="flex-grow: 1" label="${title_label}"/>
-      </div>
-      `
-    }
-    
+    const targetsSelect = document.createElement('select');
+    targetsSelect.multiple = true;
+    this.targets.forEach(target => {
+      const option = document.createElement('option');
+      option.value = target;
+      option.text = target;
+      targetsSelect.appendChild(option);
+    });
+
+    this.content.appendChild(targetsSelect);
+
     let label = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
     <div style="display: flex">   
-      <ha-textfield id="notification_text" style="flex-grow: 1" label="${label}"></ha-textfield>
-      <ha-icon-button id="send_button" slot="suffix">
-          <ha-icon icon="mdi:send">
-      </ha-icon-button>
+      <textarea id="notification_text" style="flex-grow: 1" placeholder="${label}"></textarea>
+      <button id="send_button">Send</button>
     </div>
     `;
     this.content.querySelector("#send_button").addEventListener("click", this.send.bind(this), false);
     this.content.querySelector("#notification_text").addEventListener("keydown", this.keydown.bind(this), false);
   }
 
-  send(){
+  send() {
     let msg = this.content.querySelector("#notification_text").value;
-    let title = this.content.querySelector("#notification_title")?.value ?? this.config.notification_title;
-    for (let t of this.targets) {
-      let [domain, target = null] = t.split(".");
-      if(target === null){
-        target = domain;
-        domain = "notify";
-      }
-      if(domain === "tts"){
-        this.hass.callService(domain, target, {"entity_id": this.config.entity, "message": msg});
-      } else {
-        this.hass.callService(domain, target, {message: msg, title: title, data: this.config.data});
-      }
+    let title = this.config.notification_title ?? "Home Assistant Notification";
+    let selectedTargets = Array.from(this.content.querySelector('select').selectedOptions).map(opt => opt.value);
+    
+    for (let target of selectedTargets) {
+      this.hass.callService('notify', target, {
+        message: msg,
+        title: title
+      });
     }
-    this.content.querySelectorAll("ha-textfield").forEach(e => e.value = "");
+    this.content.querySelector("#notification_text").value = "";
   }
 
-  keydown(e){
-    if(e.code == "Enter") this.send();
+  keydown(e) {
+    if (e.code == "Enter" && e.ctrlKey) {
+      this.send();
+    }
   }
 }
 
