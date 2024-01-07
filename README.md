@@ -7,6 +7,17 @@ This simple card allows you to notify any notification service manually from the
 
 ![card](card.jpg)
 
+## Manual HACS Installation Instructions
+You must manually add this repository to HACS and install the component:
+
+Open HACS in Home Assistant.
+Navigate to "Frontend" section.
+In the top right corner, click on the three dots and select "Custom repositories".
+In the dialog that appears, paste the URL of this repository (https://github.com/imonlinux/lovelace-multiselect-notify-card) into the 'Repository' field.
+Select 'Frontend' as the category.
+Click 'Add'.
+Once installed, you can proceed with the configuration steps as outlined in this README.
+
 ## Install
 ### Install via HACS
 1. Go to the "Frontend"-tab in HACS
