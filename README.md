@@ -1,5 +1,6 @@
 # Multi-Notify Card for Lovelace/Home Assistant
-Forked from https://github.com/bernikr/lovelace-notify-card. 
+Forked from https://github.com/bernikr/lovelace-notify-card.
+
 [!["Buy bernikr A Coffee"](https://img.shields.io/static/v1?label=donate&message=buymeacoffe&color=FFDD00&logo=buymeacoffee&style=flat-square)](https://buymeacoffee.com/bernikr)
 [!["Chat with bernikr on Telegram"](https://img.shields.io/static/v1?label=chat&message=Telegram&color=26A5E4&logo=telegram&style=flat-square)](https://t.me/bernikr)
 
