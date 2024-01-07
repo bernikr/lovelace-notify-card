@@ -23,10 +23,9 @@ class NotifyCard extends HTMLElement {
     this.content.style.flexDirection = 'column';
     this.content.innerHTML = "";
 
-    // Using checkboxes instead of a select dropdown
+    // Checkboxes for targets
     const targetsContainer = document.createElement('div');
     targetsContainer.style.marginBottom = '16px';
-
     this.targets.forEach(targetObj => {
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
@@ -45,16 +44,27 @@ class NotifyCard extends HTMLElement {
       container.appendChild(label);
       targetsContainer.appendChild(container);
     });
-
     this.content.appendChild(targetsContainer);
 
-    let labelText = this.config.label ?? "Notification Text";
+    // Editable notification title field
+    let notificationTitle = this.config.notification_title ?? "Home Assistant Notification";
     this.content.innerHTML += `
-    <div style="display: flex; margin-top: 16px;">   
-      <textarea id="notification_text" style="flex-grow: 1" placeholder="${labelText}"></textarea>
-      <button id="send_button">Send</button>
+    <div style="margin-bottom: 16px;">
+      <label for="notification_title">Notification Title:</label>
+      <input type="text" id="notification_title" name="notification_title" value="${notificationTitle}" style="width: 100%;">
     </div>
     `;
+
+    // Notification text area
+    let labelText = this.config.label ?? "Notification Text";
+    this.content.innerHTML += `
+    <div style="display: flex; margin-bottom: 16px;">   
+      <textarea id="notification_text" style="flex-grow: 1" placeholder="${labelText}"></textarea>
+    </div>
+    `;
+
+    // Send button
+    this.content.innerHTML += `<button id="send_button">Send</button>`;
     const sendButton = this.content.querySelector("#send_button");
     sendButton.style.backgroundColor = '#0d6efd';
     sendButton.style.color = 'white';
@@ -71,7 +81,7 @@ class NotifyCard extends HTMLElement {
 
   send() {
     let msg = this.content.querySelector("#notification_text").value;
-    let title = this.config.notification_title ?? "Home Assistant Notification";
+    let title = this.content.querySelector("#notification_title").value;
     let selectedTargets = Array.from(this.content.querySelectorAll('input[name="notification_target"]:checked')).map(checkbox => checkbox.value);
     
     selectedTargets.forEach(target => {
