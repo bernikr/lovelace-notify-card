@@ -1,4 +1,4 @@
-# Notify Card for Lovelace/Home Assistant
+# Multi-Notify Card for Lovelace/Home Assistant
 
 [!["Buy Me A Coffee"](https://img.shields.io/static/v1?label=donate&message=buymeacoffe&color=FFDD00&logo=buymeacoffee&style=flat-square)](https://buymeacoffee.com/bernikr)
 [!["Chat on Telegram"](https://img.shields.io/static/v1?label=chat&message=Telegram&color=26A5E4&logo=telegram&style=flat-square)](https://t.me/bernikr)
