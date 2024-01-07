@@ -5,7 +5,7 @@
 
 This simple card allows you to notify any notification service manually from the dashboard.
 
-![card](card.jpg)
+![card](card.png)
 
 ## Manual HACS Installation Instructions
 You must manually add this repository to HACS and install the component:
