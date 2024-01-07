@@ -1,7 +1,7 @@
 class NotifyCard extends HTMLElement {
   setConfig(config) {
     if (!config.targets) {
-      throw new Error('You need to define targets with labels');
+      throw new Error('You need to define targets');
     }
     this.config = config;
     this.targets = this.config.targets;
@@ -19,29 +19,22 @@ class NotifyCard extends HTMLElement {
     this.card.header = this.config.card_title ?? "Send Notification";
     this.content.innerHTML = "";
 
+    const targetsSelect = document.createElement('select');
+    targetsSelect.multiple = true;
+    targetsSelect.style.width = "100%";
+
     this.targets.forEach(targetObj => {
-        const target = targetObj.entity; // Access the entity ID
-        const label = targetObj.label; // Access the label
-
-        const container = document.createElement('div');
-        const checkboxInput = document.createElement('input');
-        checkboxInput.type = 'checkbox';
-        checkboxInput.id = target;
-        checkboxInput.name = 'notification_target';
-        checkboxInput.value = target;
-
-        const labelElement = document.createElement('label');
-        labelElement.htmlFor = target;
-        labelElement.textContent = label || target; // Use the label, fallback to entity ID
-
-        container.appendChild(checkboxInput);
-        container.appendChild(labelElement);
-        this.content.appendChild(container);
+      const option = document.createElement('option');
+      option.value = targetObj.entity;
+      option.text = targetObj.label || targetObj.entity;
+      targetsSelect.appendChild(option);
     });
+
+    this.content.appendChild(targetsSelect);
 
     let labelText = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
-    <div style="display: flex">   
+    <div style="display: flex; margin-top: 16px;">   
       <textarea id="notification_text" style="flex-grow: 1" placeholder="${labelText}"></textarea>
       <button id="send_button">Send</button>
     </div>
@@ -53,7 +46,7 @@ class NotifyCard extends HTMLElement {
   send() {
     let msg = this.content.querySelector("#notification_text").value;
     let title = this.config.notification_title ?? "Home Assistant Notification";
-    let selectedTargets = Array.from(this.content.querySelectorAll('input[name="notification_target"]:checked')).map(checkbox => checkbox.value);
+    let selectedTargets = Array.from(this.content.querySelector('select').selectedOptions).map(opt => opt.value);
     
     selectedTargets.forEach(target => {
       this.hass.callService('notify', target, {
