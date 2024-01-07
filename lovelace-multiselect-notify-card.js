@@ -23,20 +23,30 @@ class NotifyCard extends HTMLElement {
     this.content.style.flexDirection = 'column';
     this.content.innerHTML = "";
 
-    const targetsSelect = document.createElement('select');
-    targetsSelect.multiple = true;
-    targetsSelect.style.width = '100%';
-    targetsSelect.style.marginBottom = '16px';
-    targetsSelect.placeholder = 'Select targets...'; // Example placeholder
+    // Using checkboxes instead of a select dropdown
+    const targetsContainer = document.createElement('div');
+    targetsContainer.style.marginBottom = '16px';
 
     this.targets.forEach(targetObj => {
-      const option = document.createElement('option');
-      option.value = targetObj.entity;
-      option.text = targetObj.label || targetObj.entity;
-      targetsSelect.appendChild(option);
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = targetObj.entity;
+      checkbox.name = 'notification_target';
+      checkbox.value = targetObj.entity;
+
+      const label = document.createElement('label');
+      label.htmlFor = targetObj.entity;
+      label.textContent = targetObj.label || targetObj.entity;
+      label.style.fontSize = '1.1em'; // Slightly increased font size
+      label.style.marginLeft = '8px';
+
+      const container = document.createElement('div');
+      container.appendChild(checkbox);
+      container.appendChild(label);
+      targetsContainer.appendChild(container);
     });
 
-    this.content.appendChild(targetsSelect);
+    this.content.appendChild(targetsContainer);
 
     let labelText = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
@@ -62,7 +72,7 @@ class NotifyCard extends HTMLElement {
   send() {
     let msg = this.content.querySelector("#notification_text").value;
     let title = this.config.notification_title ?? "Home Assistant Notification";
-    let selectedTargets = Array.from(this.content.querySelector('select').selectedOptions).map(opt => opt.value);
+    let selectedTargets = Array.from(this.content.querySelectorAll('input[name="notification_target"]:checked')).map(checkbox => checkbox.value);
     
     selectedTargets.forEach(target => {
       this.hass.callService('notify', target, {
