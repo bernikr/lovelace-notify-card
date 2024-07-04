@@ -44,7 +44,7 @@ class NotifyCard extends HTMLElement {
     </div>
     `;
     this.content.querySelector("#send_button").addEventListener("click", this.send.bind(this), false);
-    this.content.querySelector("#notification_text").addEventListener("keydown", this.keydown.bind(this), false);
+    this.content.querySelector("#notification_text").addEventListener("keydown", this.keydown.bind(this), false)
   }
 
   send(){
@@ -56,8 +56,9 @@ class NotifyCard extends HTMLElement {
         target = domain;
         domain = "notify";
       }
+
       if(domain === "tts"){
-        this.hass.callService(domain, target, {"entity_id": this.config.entity, "message": msg});
+        this.hass.callService(domain, target, {"entity_id": this.config.service, "media_player_entity_id": this.config.entity, "message": msg});
       } else {
         this.hass.callService(domain, target, {message: msg, title: title, data: this.config.data});
       }
