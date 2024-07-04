@@ -73,10 +73,11 @@ data:
   type: announce
 ```
 
-If your want to use `tts.google_translate_say`, include an entity like this:
+If your want to use `tts.speak`, include an entity like this:
 ```
 type: 'custom:notify-card'
-target: tts.google_translate_say
+target: tts.speak
+service: tts.google_fr_fr
 entity: media_player.google_nest_mini
 ```
 
