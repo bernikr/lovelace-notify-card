@@ -29,24 +29,29 @@ Example config:
 
 ```
 type: 'custom:notify-card'
-target: living_room_tv
 label: Notify TV
 card_title: Send Notification
-notification_title: 'New Notification'
+notification_title:
+  input: Title
+action: notify.living_room_tv
+data:
+  message: $MSG
+  title: $TITLE
 ```
 
-- `target` is the name of the notify-service that should get called without the `notify.` domain. (For `notify.notify` put in `notify`, for `notify.telegram` put in `telegram`, etc. If your service is not under the `notify.` domain, use the full service name, example: `script.notify_tv`)
+- `action` is the name of the action (service) to be called
+- `data` is used to define the data that gets passed to the action. Any data can be entered here, and `$MSG` and `$TITLE` will be replaced with the entered text
 - `label` is optional and controlls the placeholder text
 - `card_title` is optional and controlles the card title
-- `notification_title` is optional and is the title that gets sent with the notification
+- `notification_title` is optional and can be used as a second textfield
 
-You can also specify multiple notification services like this:
+Minimal config:
 
 ```
 type: 'custom:notify-card'
-target:
-- living_room_tv
-- notify
+action: notify.living_room_tv
+data:
+  message: $MSG
 ```
 
 If you want a textfield to set the notification title with every message you can configure it like this:
@@ -64,20 +69,3 @@ target: living_room_tv
 notification_ title:
   input: 'Put Title here'
 ```
-
-If your notification service requires additional data (e.g. Alexa) you can include it like this:
-```
-type: 'custom:notify-card'
-target: alexa_media_living_room
-data:
-  type: announce
-```
-
-If your want to use `tts.speak`, include an entity like this:
-```
-type: 'custom:notify-card'
-target: tts.speak
-service: tts.google_fr_fr
-entity: media_player.google_nest_mini
-```
-
