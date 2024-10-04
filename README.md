@@ -54,6 +54,16 @@ data:
   message: $MSG
 ```
 
+For services that require an entity as a target:
+
+```
+type: 'custom:notify-card'
+action: tts.google_say
+data:
+  message: $MSG
+  entity_id: media_player.nestmini_living_room
+```
+
 If you want a textfield to set the notification title with every message you can configure it like this:
 ```
 type: 'custom:notify-card'
