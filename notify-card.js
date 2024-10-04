@@ -62,8 +62,12 @@ class NotifyCard extends HTMLElement {
           )
         );
       }
-      
-      return dict in terms ? terms[dict] : dict;
+
+      for (const [key, value] of Object.entries(terms)) {
+        dict = dict.replaceAll(key, value);
+      }
+
+      return dict;
     };
 
 
