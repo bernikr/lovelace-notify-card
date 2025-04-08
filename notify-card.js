@@ -4,7 +4,9 @@ class NotifyCard extends HTMLElement {
       throw new Error('You need to define an action and data');
     }
     this.config = config;
-    if(config.target){
+
+    // support for legacy config
+    if(!config.action && config.target) {
       if (typeof this.config.target == "string") {
         this.targets = [this.config.target];
       } else if (Array.isArray(this.config.target)) {
@@ -77,8 +79,9 @@ class NotifyCard extends HTMLElement {
     if(this.config.action){
       let data = dict_replace(this.config.data, {"$MSG": msg, "$TITLE": title})
       let [domain, service] = this.config.action.split(".");
-      this.hass.callService(domain, service, data);
+      this.hass.callService(domain, service, data, this.config.target);
     }else{
+      // support for legacy config
       for (let t of this.targets) {
         let [domain, target = null] = t.split(".");
         if(target === null){
