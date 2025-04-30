@@ -6,7 +6,7 @@ class NotifyCard extends HTMLElement {
     this.config = config;
 
     // support for legacy config
-    if(!config.action && config.target) {
+    if (!config.action && config.target) {
       if (typeof this.config.target == "string") {
         this.targets = [this.config.target];
       } else if (Array.isArray(this.config.target)) {
@@ -29,7 +29,7 @@ class NotifyCard extends HTMLElement {
     this.card.header = this.config.card_title ?? "Send Notification";
     this.content.innerHTML = "";
 
-    if(this.config.notification_title instanceof Object){
+    if (this.config.notification_title instanceof Object) {
       let title_label = this.config.notification_title.input ?? "Notification Title"
       this.content.innerHTML += `
       <div style="display: flex">
@@ -37,7 +37,7 @@ class NotifyCard extends HTMLElement {
       </div>
       `
     }
-    
+
     let label = this.config.label ?? "Notification Text";
     this.content.innerHTML += `
     <div style="display: flex">   
@@ -51,48 +51,63 @@ class NotifyCard extends HTMLElement {
     this.content.querySelector("#notification_text").addEventListener("keydown", this.keydown.bind(this), false)
   }
 
-  send(){
-    const dict_replace = (dict, terms) => {
-      if(Array.isArray(dict)) {
-        return dict.map(t => dict_replace(t, terms));
-      }
-      
-      if(typeof dict === 'object' && dict !== null) {
-        return Object.fromEntries(
-          Object.entries(dict)
-            .map(([k, v]) => [k, dict_replace(v, terms)]
-          )
-        );
+  send() {
+    const recursive_render_template = (data, variables, replacement_terms) => {
+      if (Array.isArray(data)) {
+        return Promise.all(data.map(t => recursive_render_template(t, variables, replacement_terms)));
       }
 
-      for (const [key, value] of Object.entries(terms)) {
-        dict = dict.replaceAll(key, value);
+      if (typeof data === 'object' && data !== null) {
+        return Promise.all(
+          Object.entries(data)
+            .map(([k, v]) => recursive_render_template(v, variables, replacement_terms).then(nv => [k, nv]))
+        ).then(res => Object.fromEntries(res));
       }
 
-      return dict;
-    };
-
+      if (typeof data === "string") {
+        for (const [key, value] of Object.entries(replacement_terms)) {
+          data = data.replaceAll(key, value);
+        }
+        if (data.includes("{{") || data.includes("{%")) {
+          return this.hass.callApi("post", "template", { "template": data, "variables": variables });
+        }
+      }
+      return Promise.resolve(data);
+    }
 
     let msg = this.content.querySelector("#notification_text").value;
     let title = this.content.querySelector("#notification_title")?.value ?? this.config.notification_title;
 
-    if(this.config.action){
-      let data = dict_replace(this.config.data, {"$MSG": msg, "$TITLE": title})
+    if (this.config.action) {
       let [domain, service] = this.config.action.split(".");
-      this.hass.callService(domain, service, data, this.config.target);
-    }else{
+      recursive_render_template(this.config.data, {
+        "msg": msg,
+        "title": title,
+        "user": this.hass.user,
+      }, {
+        // legacy support
+        "$MSG": msg,
+        "$TITLE": title,
+        // save on template rendering request for common cases
+        "{{ msg }}": msg,
+        "{{ title }}": title,
+        "{{ user.name }}": this.hass.user.name,
+      }).then(data => {
+        this.hass.callService(domain, service, data, this.config.target);
+      })
+    } else {
       // support for legacy config
       for (let t of this.targets) {
         let [domain, target = null] = t.split(".");
-        if(target === null){
+        if (target === null) {
           target = domain;
           domain = "notify";
         }
-  
-        if(domain === "tts"){
-          this.hass.callService(domain, target, {"entity_id": this.config.service, "media_player_entity_id": this.config.entity, "message": msg});
+
+        if (domain === "tts") {
+          this.hass.callService(domain, target, { "entity_id": this.config.service, "media_player_entity_id": this.config.entity, "message": msg });
         } else {
-          this.hass.callService(domain, target, {message: msg, title: title, data: this.config.data});
+          this.hass.callService(domain, target, { message: msg, title: title, data: this.config.data });
         }
       }
     }
@@ -100,8 +115,8 @@ class NotifyCard extends HTMLElement {
     this.content.querySelectorAll("ha-textfield").forEach(e => e.value = "");
   }
 
-  keydown(e){
-    if(e.code == "Enter") this.send();
+  keydown(e) {
+    if (e.code == "Enter") this.send();
   }
 }
 
