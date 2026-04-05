@@ -18,15 +18,36 @@ class NotifyCard extends HTMLElement {
     this.render();
   }
 
+  set hass(hass) {
+    // Store hass reference for callService and callApi use in send()
+    this._hass = hass;
+  }
+
+  get hass() {
+    return this._hass;
+  }
+
   render() {
     if (!this.content) {
       this.card = document.createElement('ha-card');
       this.content = document.createElement('div');
-      this.content.style.padding = '0 16px 16px';
       this.card.appendChild(this.content);
       this.appendChild(this.card);
     }
-    this.card.header = this.config.card_title ?? "Send Notification";
+
+    // Only set header when card_title is not explicitly false
+    this.card.header = this.config.card_title !== false ? (this.config.card_title ?? "Send Notification") : null;
+
+    // Adjust top padding based on whether a header is present
+    this.content.style.padding = this.config.card_title !== false ? '0 16px 16px' : '16px';
+
+    // Remove border, shadow, and background when used inside another card (group mode)
+    if (this.config.group) {
+      this.card.style.border = 'none';
+      this.card.style.boxShadow = 'none';
+      this.card.style.background = 'transparent';
+    }
+
     this.content.innerHTML = "";
 
     if (this.config.notification_title instanceof Object) {
@@ -39,16 +60,27 @@ class NotifyCard extends HTMLElement {
     }
 
     let label = this.config.label ?? "Notification Text";
+    let icon = this.config.icon ?? "mdi:send";
     this.content.innerHTML += `
-    <div style="display: flex">   
+    <div style="display: flex; align-items: center; gap: 8px;">
       <ha-textfield id="notification_text" style="flex-grow: 1" label="${label}"></ha-textfield>
-      <ha-icon-button id="send_button" slot="suffix">
-          <ha-icon icon="mdi:send">
+      <ha-icon-button id="send_button">
+          <ha-icon icon="${icon}">
       </ha-icon-button>
     </div>
     `;
-    this.content.querySelector("#send_button").addEventListener("click", this.send.bind(this), false);
-    this.content.querySelector("#notification_text").addEventListener("keydown", this.keydown.bind(this), false)
+
+    // Replace nodes to drop any previously attached event listeners before re-binding
+    const sendBtn = this.content.querySelector("#send_button");
+    const freshSendBtn = sendBtn.cloneNode(true);
+    sendBtn.parentNode.replaceChild(freshSendBtn, sendBtn);
+
+    const textField = this.content.querySelector("#notification_text");
+    const freshTextField = textField.cloneNode(true);
+    textField.parentNode.replaceChild(freshTextField, textField);
+
+    freshSendBtn.addEventListener("click", this.send.bind(this), false);
+    freshTextField.addEventListener("keydown", this.keydown.bind(this), false);
   }
 
   send() {
@@ -117,6 +149,11 @@ class NotifyCard extends HTMLElement {
 
   keydown(e) {
     if (e.code == "Enter") this.send();
+  }
+
+  getCardSize() {
+    // One row for the text input, plus one if a notification title input is present
+    return this.config.notification_title instanceof Object ? 2 : 1;
   }
 }
 
