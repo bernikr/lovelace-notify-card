@@ -35,11 +35,14 @@ class NotifyCard extends HTMLElement {
       this.appendChild(this.card);
     }
 
+    // Guard against YAML passing false as the string "false"
+    const hasTitle = this.config.card_title !== false && this.config.card_title !== 'false';
+
     // Only set header when card_title is not explicitly false
-    this.card.header = this.config.card_title !== false ? (this.config.card_title ?? "Send Notification") : null;
+    this.card.header = hasTitle ? (this.config.card_title ?? "Send Notification") : null;
 
     // Adjust top padding based on whether a header is present
-    this.content.style.padding = this.config.card_title !== false ? '0 16px 16px' : '16px';
+    this.content.style.padding = hasTitle ? '0 16px 16px' : '16px';
 
     // Remove border, shadow, and background when used inside another card (group mode)
     if (this.config.group) {
