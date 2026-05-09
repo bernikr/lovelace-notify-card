@@ -83,8 +83,10 @@ class NotifyCard extends HTMLElement {
       <div style="display: flex; align-items: center; gap: 8px;">
         <ha-input
           id="notification_text"
-          style="flex-grow: 1"
-          label="${label}">
+          style="flex-grow: 1;` +
+          // Balance ha-input box vertically with no title
+          (hasTitle ? '"' : ' padding-top: 8px;"') +
+          `label="${label}">
         </ha-input>
 
         <ha-icon-button id="send_button">
