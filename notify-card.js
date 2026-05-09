@@ -48,6 +48,7 @@ class NotifyCard extends HTMLElement {
       : null;
 
     // Adjust top padding based on whether a header is present
+    // as per ha-card's default styles to maintain consistent spacing
     this.content.style.padding = hasTitle
       ? '0 16px 16px'
       : '16px';
@@ -79,17 +80,30 @@ class NotifyCard extends HTMLElement {
     const label = this.config.label ?? "Notification Text";
     const icon = this.config.icon ?? "mdi:send";
 
+    // Nudge internal styling as ha-input adds padding-bottom: 8px.
+    // That misaligns the send button when the title is present and breaks
+    // ha-card 16px all-round padding when the title is absent.
+    // If ha-input is ever fixed (as it should be...) then these two nudges
+    // can be removed and the default ha-input styling will work as expected.
+    const inputStyle = hasTitle
+      ? 'flex-grow: 1;'
+      : 'flex-grow: 1; padding-bottom: 0px;';
+
+    const buttonStyle = hasTitle
+      ? 'padding-bottom: 8px;'
+      : '';
+
     this.content.innerHTML += `
       <div style="display: flex; align-items: center; gap: 8px;">
         <ha-input
           id="notification_text"
-          style="flex-grow: 1;` +
-          // Balance ha-input box vertically with no title
-          (hasTitle ? '"' : ' padding-top: 8px;"') +
-          `label="${label}">
+          style="${inputStyle}"
+          label="${label}">
         </ha-input>
 
-        <ha-icon-button id="send_button">
+        <ha-icon-button
+          id="send_button"
+          style="${buttonStyle}">
           <ha-icon icon="${icon}"></ha-icon>
         </ha-icon-button>
       </div>
