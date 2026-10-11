@@ -21,7 +21,7 @@ class NotifyCard extends HTMLElement {
   }
 
   set hass(hass) {
-    // Store hass reference for callService and callApi use in send()
+    // Store hass reference for service calls and template rendering in send()
     this._hass = hass;
   }
 
@@ -131,6 +131,83 @@ class NotifyCard extends HTMLElement {
     );
   }
 
+  renderTemplate(template, variables) {
+    return new Promise((resolve, reject) => {
+      // A result can arrive before subscribeMessage provides its unsubscribe
+      // function. Remember pending cleanup so this one-shot subscription
+      // cannot remain active after it has settled.
+      let unsubscribe;
+      let unsubscribePending = false;
+      let settled = false;
+
+      const cleanup = () => {
+        if (unsubscribe) {
+          const unsubscribeNow = unsubscribe;
+          unsubscribe = undefined;
+          unsubscribeNow();
+        } else {
+          unsubscribePending = true;
+        }
+      };
+
+      const resolveOnce = value => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve(value);
+      };
+
+      const rejectOnce = error => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(error);
+      };
+
+      this.hass.connection.subscribeMessage(
+        event => {
+          if (event.error) {
+            if (event.level === "WARNING") {
+              console.warn(`Notify Card template warning: ${event.error}`);
+              return;
+            }
+
+            rejectOnce(new Error(event.error));
+            return;
+          }
+
+          resolveOnce(event.result);
+        },
+        {
+          type: "render_template",
+          template: template,
+          variables: variables,
+          report_errors: true,
+        }
+      ).then(unsubscribeFunction => {
+        unsubscribe = unsubscribeFunction;
+        if (unsubscribePending) cleanup();
+      }).catch(rejectOnce);
+    });
+  }
+
+  showError(error) {
+    const message = error instanceof Error
+      ? error.message
+      : String(error);
+
+    console.error("Notify Card:", error);
+    this.dispatchEvent(
+      new CustomEvent("hass-notification", {
+        bubbles: true,
+        composed: true,
+        detail: {
+          message: `Notify Card: ${message}`,
+        },
+      })
+    );
+  }
+
   send() {
     const recursive_render_template = (
       data,
@@ -169,14 +246,9 @@ class NotifyCard extends HTMLElement {
         }
 
         if (data.includes("{{") || data.includes("{%")) {
-          return this.hass.callApi(
-            "post",
-            "template",
-            {
-              template: data,
-              variables: variables,
-            }
-          );
+          // The REST template endpoint requires an administrator. The
+          // WebSocket renderer does not require administrator privileges.
+          return this.renderTemplate(data, variables);
         }
       }
 
@@ -211,14 +283,14 @@ class NotifyCard extends HTMLElement {
           "{{ title }}": title,
           "{{ user.name }}": this.hass.user.name,
         }
-      ).then(data => {
+      ).then(data =>
         this.hass.callService(
           domain,
           service,
           data,
           this.config.target
-        );
-      });
+        )
+      ).catch(error => this.showError(error));
 
     } else {
       // support for legacy config
