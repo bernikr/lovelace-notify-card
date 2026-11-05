@@ -44,7 +44,7 @@ class NotifyCard extends HTMLElement {
 
     // Only set header when card_title is not explicitly false
     this.card.header = hasTitle
-      ? (this.config.card_title ?? "Send Notification")
+      ? (this.config.card_title || "Send Notification")
       : null;
 
     // Adjust top padding based on whether a header is present
@@ -70,28 +70,31 @@ class NotifyCard extends HTMLElement {
         <div style="display: flex">
           <ha-input
             id="notification_title"
-            style="flex-grow: 1"
+            style="flex-grow: 1; min-width: 0"
             label="${title_label}">
           </ha-input>
         </div>
       `;
     }
 
-    const label = this.config.label ?? "Notification Text";
-    const icon = this.config.icon ?? "mdi:send";
+    const label = this.config.label || "Notification Text";
+    const icon = this.config.icon || "mdi:send";
 
     // Nudge internal styling as ha-input adds padding-bottom: 8px.
     // That misaligns the send button when the title is present and breaks
     // ha-card 16px all-round padding when the title is absent.
     // If ha-input is ever fixed (as it should be...) then these two nudges
     // can be removed and the default ha-input styling will work as expected.
+    // min-width: 0 lets the text field shrink to fit narrow cards, such as
+    // a half-width card in a sections dashboard, instead of pushing the send
+    // button outside the card.
     const inputStyle = hasTitle
-      ? 'flex-grow: 1;'
-      : 'flex-grow: 1; padding-bottom: 0px;';
+      ? 'flex-grow: 1; min-width: 0;'
+      : 'flex-grow: 1; min-width: 0; padding-bottom: 0px;';
 
     const buttonStyle = hasTitle
-      ? 'padding-bottom: 8px;'
-      : '';
+      ? 'flex-shrink: 0; padding-bottom: 8px;'
+      : 'flex-shrink: 0;';
 
     this.content.innerHTML += `
       <div style="display: flex; align-items: center; gap: 8px;">
@@ -276,11 +279,11 @@ class NotifyCard extends HTMLElement {
         {
           // legacy support
           "$MSG": msg,
-          "$TITLE": title,
+          "$TITLE": title ?? "",
 
           // save on template rendering request for common cases
           "{{ msg }}": msg,
-          "{{ title }}": title,
+          "{{ title }}": title ?? "",
           "{{ user.name }}": this.hass.user.name,
         }
       ).then(data =>
