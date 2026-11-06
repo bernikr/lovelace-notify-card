@@ -7,14 +7,12 @@ This simple card allows you to notify any notification service manually from the
 
 ![card](card.jpg)
 
+<!-- ha-marketplace:exclude-start -->
 ## Install
 
-### Install via HACS
+### Install via Marketplace (recommended)
 
-1. Go to the "Frontend"-tab in HACS
-2. Click on "Explore & Add Repositories"
-3. Search for `Notify Card`
-4. Click "Install this Repository in HACS"
+[![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=bernikr&repository=lovelace-notify-card)
 
 ### Manual install
 
@@ -26,6 +24,7 @@ resources:
   - url: /local/notify-card.js
     type: module
 ```
+<!-- ha-marketplace:exclude-end -->
 
 ## Config
 
