@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 bernikr <hi@berni.kr>
+
+SPDX-License-Identifier: MIT
+-->
+
 # Notify Card for Lovelace/Home Assistant
 
 [!["Buy Me A Coffee"](https://img.shields.io/static/v1?label=donate&message=buymeacoffee&color=FFDD00&logo=buymeacoffee&style=flat-square)](https://buymeacoffee.com/bernikr)
@@ -7,9 +13,15 @@ This simple card allows you to notify any notification service manually from the
 
 ![card](card.jpg)
 
+<!-- ha-marketplace:exclude-start -->
+
 ## Install
 
-### Home Assistant 2026.11 and later
+### Install via Marketplace (recommended)
+
+For Home Assistant 2026.11 and later:
+
+[![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=bernikr&repository=lovelace-notify-card)
 
 1. Go to Settings → Marketplace
 2. Search for `Notify Card`
@@ -33,6 +45,8 @@ resources:
     type: module
 ```
 
+<!-- ha-marketplace:exclude-end -->
+
 ## How the card works
 
 The card has a text field and a send button. When you press send (or Enter), the card builds the action's data from your config, puts the text you typed wherever the config asks for it, and calls the action. The text you typed is available as `{{ msg }}`.
@@ -54,28 +68,28 @@ The new style is what the visual editor creates. The action is configured under 
 
 ### Options
 
-| Option | Default | Description |
-|---|---|---|
-| `send_action` | required | The action performed when a message is sent |
-| `send_action.action` | | Always `perform-action` |
-| `send_action.perform_action` | | The action to call, for example `notify.living_room_tv` |
-| `send_action.data` | | Optional data passed to the action. Supports templates |
-| `send_action.target` | | Optional entities, devices or areas the action targets |
-| `card_title` | `Send Notification` | Title shown at the top of the card |
-| `show_title` | `true` | Set to `false` to hide the title and remove the header padding |
-| `label` | `Notification Text` | Label of the text field |
-| `icon` | `mdi:send` | Icon of the send button |
-| `group` | `false` | Set to `true` when embedding inside another card: removes the border, box shadow and background so the card blends into its parent |
-| `notification_title` | none | Adds a notification title, typed on the card or fixed (YAML only) |
+| Option                       | Default             | Description                                                                                                                        |
+| ---------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `send_action`                | required            | The action performed when a message is sent                                                                                        |
+| `send_action.action`         |                     | Always `perform-action`                                                                                                            |
+| `send_action.perform_action` |                     | The action to call, for example `notify.living_room_tv`                                                                            |
+| `send_action.data`           |                     | Optional data passed to the action. Supports templates                                                                             |
+| `send_action.target`         |                     | Optional entities, devices or areas the action targets                                                                             |
+| `card_title`                 | `Send Notification` | Title shown at the top of the card                                                                                                 |
+| `show_title`                 | `true`              | Set to `false` to hide the title and remove the header padding                                                                     |
+| `label`                      | `Notification Text` | Label of the text field                                                                                                            |
+| `icon`                       | `mdi:send`          | Icon of the send button                                                                                                            |
+| `group`                      | `false`             | Set to `true` when embedding inside another card: removes the border, box shadow and background so the card blends into its parent |
+| `notification_title`         | none                | Adds a notification title, typed on the card or fixed (YAML only)                                                                  |
 
 ### Building the message
 
 These variables can be used in `send_action.data`:
 
-| Variable | Value |
-|---|---|
-| `{{ msg }}` | The text typed into the card |
-| `{{ title }}` | The notification title, if `notification_title` is set; otherwise empty |
+| Variable          | Value                                                                     |
+| ----------------- | ------------------------------------------------------------------------- |
+| `{{ msg }}`       | The text typed into the card                                              |
+| `{{ title }}`     | The notification title, if `notification_title` is set; otherwise empty   |
 | `{{ user.name }}` | The name of the user sending the message (`user` is the full user object) |
 
 Any other Home Assistant template is rendered too, with `msg`, `title` and `user` as variables. Templates work for users who are not administrators.

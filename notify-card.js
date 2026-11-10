@@ -1,11 +1,17 @@
+// SPDX-FileCopyrightText: 2021 bernikr <hi@berni.kr>
+//
+// SPDX-License-Identifier: MIT
+
 class NotifyCard extends HTMLElement {
   setConfig(config) {
     if (config.send_action) {
       if (!(config.send_action.perform_action ?? config.send_action.service)) {
-        throw new Error('You need to choose an action to perform');
+        throw new Error("You need to choose an action to perform");
       }
     } else if (!config.target && (!config.action || !config.data)) {
-      throw new Error('You need to define a send_action, or an action and data');
+      throw new Error(
+        "You need to define a send_action, or an action and data",
+      );
     }
 
     this.config = config;
@@ -17,7 +23,7 @@ class NotifyCard extends HTMLElement {
       } else if (Array.isArray(this.config.target)) {
         this.targets = this.config.target;
       } else {
-        throw new Error('Target needs to be a list or single target');
+        throw new Error("Target needs to be a list or single target");
       }
     }
 
@@ -35,8 +41,8 @@ class NotifyCard extends HTMLElement {
 
   render() {
     if (!this.content) {
-      this.card = document.createElement('ha-card');
-      this.content = document.createElement('div');
+      this.card = document.createElement("ha-card");
+      this.content = document.createElement("div");
       this.card.appendChild(this.content);
       this.appendChild(this.card);
     }
@@ -46,24 +52,22 @@ class NotifyCard extends HTMLElement {
     const hasTitle =
       this.config.show_title !== false &&
       this.config.card_title !== false &&
-      this.config.card_title !== 'false';
+      this.config.card_title !== "false";
 
     // Only set header when the title is shown
     this.card.header = hasTitle
-      ? (this.config.card_title || "Send Notification")
+      ? this.config.card_title || "Send Notification"
       : null;
 
     // Adjust top padding based on whether a header is present
     // as per ha-card's default styles to maintain consistent spacing
-    this.content.style.padding = hasTitle
-      ? '0 16px 16px'
-      : '16px';
+    this.content.style.padding = hasTitle ? "0 16px 16px" : "16px";
 
     // Remove border, shadow, and background when used inside another card (group mode)
     if (this.config.group) {
-      this.card.style.border = 'none';
-      this.card.style.boxShadow = 'none';
-      this.card.style.background = 'transparent';
+      this.card.style.border = "none";
+      this.card.style.boxShadow = "none";
+      this.card.style.background = "transparent";
     }
 
     this.content.innerHTML = "";
@@ -95,12 +99,12 @@ class NotifyCard extends HTMLElement {
     // a half-width card in a sections dashboard, instead of pushing the send
     // button outside the card.
     const inputStyle = hasTitle
-      ? 'flex-grow: 1; min-width: 0;'
-      : 'flex-grow: 1; min-width: 0; padding-bottom: 0px;';
+      ? "flex-grow: 1; min-width: 0;"
+      : "flex-grow: 1; min-width: 0; padding-bottom: 0px;";
 
     const buttonStyle = hasTitle
-      ? 'flex-shrink: 0; padding-bottom: 8px;'
-      : 'flex-shrink: 0;';
+      ? "flex-shrink: 0; padding-bottom: 8px;"
+      : "flex-shrink: 0;";
 
     this.content.innerHTML += `
       <div style="display: flex; align-items: center; gap: 8px;">
@@ -127,17 +131,9 @@ class NotifyCard extends HTMLElement {
     const freshTextField = textField.cloneNode(true);
     textField.parentNode.replaceChild(freshTextField, textField);
 
-    freshSendBtn.addEventListener(
-      "click",
-      this.send.bind(this),
-      false
-    );
+    freshSendBtn.addEventListener("click", this.send.bind(this), false);
 
-    freshTextField.addEventListener(
-      "keydown",
-      this.keydown.bind(this),
-      false
-    );
+    freshTextField.addEventListener("keydown", this.keydown.bind(this), false);
   }
 
   renderTemplate(template, variables) {
@@ -159,51 +155,52 @@ class NotifyCard extends HTMLElement {
         }
       };
 
-      const resolveOnce = value => {
+      const resolveOnce = (value) => {
         if (settled) return;
         settled = true;
         cleanup();
         resolve(value);
       };
 
-      const rejectOnce = error => {
+      const rejectOnce = (error) => {
         if (settled) return;
         settled = true;
         cleanup();
         reject(error);
       };
 
-      this.hass.connection.subscribeMessage(
-        event => {
-          if (event.error) {
-            if (event.level === "WARNING") {
-              console.warn(`Notify Card template warning: ${event.error}`);
+      this.hass.connection
+        .subscribeMessage(
+          (event) => {
+            if (event.error) {
+              if (event.level === "WARNING") {
+                console.warn(`Notify Card template warning: ${event.error}`);
+                return;
+              }
+
+              rejectOnce(new Error(event.error));
               return;
             }
 
-            rejectOnce(new Error(event.error));
-            return;
-          }
-
-          resolveOnce(event.result);
-        },
-        {
-          type: "render_template",
-          template: template,
-          variables: variables,
-          report_errors: true,
-        }
-      ).then(unsubscribeFunction => {
-        unsubscribe = unsubscribeFunction;
-        if (unsubscribePending) cleanup();
-      }).catch(rejectOnce);
+            resolveOnce(event.result);
+          },
+          {
+            type: "render_template",
+            template: template,
+            variables: variables,
+            report_errors: true,
+          },
+        )
+        .then((unsubscribeFunction) => {
+          unsubscribe = unsubscribeFunction;
+          if (unsubscribePending) cleanup();
+        })
+        .catch(rejectOnce);
     });
   }
 
   showError(error) {
-    const message = error instanceof Error
-      ? error.message
-      : String(error);
+    const message = error instanceof Error ? error.message : String(error);
 
     console.error("Notify Card:", error);
     this.dispatchEvent(
@@ -213,40 +210,28 @@ class NotifyCard extends HTMLElement {
         detail: {
           message: `Notify Card: ${message}`,
         },
-      })
+      }),
     );
   }
 
   send() {
-    const recursive_render_template = (
-      data,
-      variables,
-      replacement_terms
-    ) => {
-
+    const recursive_render_template = (data, variables, replacement_terms) => {
       if (Array.isArray(data)) {
         return Promise.all(
-          data.map(t =>
-            recursive_render_template(
-              t,
-              variables,
-              replacement_terms
-            )
-          )
+          data.map((t) =>
+            recursive_render_template(t, variables, replacement_terms),
+          ),
         );
       }
 
-      if (typeof data === 'object' && data !== null) {
+      if (typeof data === "object" && data !== null) {
         return Promise.all(
-          Object.entries(data)
-            .map(([k, v]) =>
-              recursive_render_template(
-                v,
-                variables,
-                replacement_terms
-              ).then(nv => [k, nv])
-            )
-        ).then(res => Object.fromEntries(res));
+          Object.entries(data).map(([k, v]) =>
+            recursive_render_template(v, variables, replacement_terms).then(
+              (nv) => [k, nv],
+            ),
+          ),
+        ).then((res) => Object.fromEntries(res));
       }
 
       if (typeof data === "string") {
@@ -264,8 +249,7 @@ class NotifyCard extends HTMLElement {
       return Promise.resolve(data);
     };
 
-    const msg =
-      this.content.querySelector("#notification_text").value;
+    const msg = this.content.querySelector("#notification_text").value;
 
     const title =
       this.content.querySelector("#notification_title")?.value ??
@@ -297,8 +281,7 @@ class NotifyCard extends HTMLElement {
     }
 
     if (action) {
-      const [domain, service] =
-        action.action.split(".");
+      const [domain, service] = action.action.split(".");
 
       recursive_render_template(
         action.data,
@@ -309,27 +292,22 @@ class NotifyCard extends HTMLElement {
         },
         {
           // legacy support
-          "$MSG": msg,
-          "$TITLE": title ?? "",
+          $MSG: msg,
+          $TITLE: title ?? "",
 
           // save on template rendering request for common cases
           "{{ msg }}": msg,
           "{{ title }}": title ?? "",
           "{{ user.name }}": this.hass.user.name,
-        }
-      ).then(data =>
-        this.hass.callService(
-          domain,
-          service,
-          data,
-          action.target
+        },
+      )
+        .then((data) =>
+          this.hass.callService(domain, service, data, action.target),
         )
-      ).catch(error => this.showError(error));
-
+        .catch((error) => this.showError(error));
     } else {
       // support for legacy config
       for (const t of this.targets) {
-
         let [domain, target = null] = t.split(".");
 
         if (target === null) {
@@ -338,33 +316,22 @@ class NotifyCard extends HTMLElement {
         }
 
         if (domain === "tts") {
-          this.hass.callService(
-            domain,
-            target,
-            {
-              entity_id: this.config.service,
-              media_player_entity_id: this.config.entity,
-              message: msg,
-            }
-          );
-
+          this.hass.callService(domain, target, {
+            entity_id: this.config.service,
+            media_player_entity_id: this.config.entity,
+            message: msg,
+          });
         } else {
-          this.hass.callService(
-            domain,
-            target,
-            {
-              message: msg,
-              title: title,
-              data: this.config.data,
-            }
-          );
+          this.hass.callService(domain, target, {
+            message: msg,
+            title: title,
+            data: this.config.data,
+          });
         }
       }
     }
 
-    this.content
-      .querySelectorAll("ha-input")
-      .forEach(e => e.value = "");
+    this.content.querySelectorAll("ha-input").forEach((e) => (e.value = ""));
   }
 
   keydown(e) {
@@ -432,13 +399,17 @@ class NotifyCard extends HTMLElement {
           selector: { ui_action: { actions: ["perform-action"] } },
         },
       ],
-      computeLabel: schema => labels[schema.name],
-      assertConfig: config => {
+      computeLabel: (schema) => labels[schema.name],
+      assertConfig: (config) => {
         if (!config.send_action && (config.action || config.target)) {
-          throw new Error("Cards using action, data and target can only be edited in YAML. Move them into send_action to use the visual editor");
+          throw new Error(
+            "Cards using action, data and target can only be edited in YAML. Move them into send_action to use the visual editor",
+          );
         }
-        if (config.card_title === false || config.card_title === 'false') {
-          throw new Error("Replace card_title: false with show_title: false to use the visual editor");
+        if (config.card_title === false || config.card_title === "false") {
+          throw new Error(
+            "Replace card_title: false with show_title: false to use the visual editor",
+          );
         }
       },
     };
@@ -447,9 +418,7 @@ class NotifyCard extends HTMLElement {
   getCardSize() {
     // One row for the text input,
     // plus one if a notification title input is present
-    return this.config.notification_title instanceof Object
-      ? 2
-      : 1;
+    return this.config.notification_title instanceof Object ? 2 : 1;
   }
 
   getGridOptions() {
@@ -461,7 +430,7 @@ class NotifyCard extends HTMLElement {
   }
 }
 
-customElements.define('notify-card', NotifyCard);
+customElements.define("notify-card", NotifyCard);
 
 // Register with the dashboard card picker
 window.customCards = window.customCards || [];
