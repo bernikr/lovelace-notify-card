@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: 2026 bernikr <hi@berni.kr>
+#
+# SPDX-License-Identifier: MIT
+
+# Install with `prek install`
+default_install_hook_types: [pre-commit, commit-msg]
+repos:
+  - repo: builtin
+    hooks:
+      - id: check-added-large-files
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: check-yaml
+      - id: check-toml
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: detect-private-key
+  - repo: local
+    hooks:
+      - id: js-format
+        name: js format
+        language: node
+        entry: prettier
+        additional_dependencies:
+          - prettier@3.9.10
+        args: ["--ignore-unknown", "--write"]
+        stages: [pre-commit]
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
+        args:
+          - --contrib=CT1
+          - --ignore=B6
+          - --msg-filename
