@@ -26,6 +26,10 @@ repos:
           - prettier@3.9.10
         args: ["--ignore-unknown", "--write"]
         stages: [pre-commit]
+  - repo: https://codeberg.org/fsfe/reuse-tool
+    rev: v6.2.0
+    hooks:
+      - id: reuse
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.19.1
     hooks:

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 bernikr <hi@berni.kr>
+//
+// SPDX-License-Identifier: MIT
+
 class NotifyCard extends HTMLElement {
   setConfig(config) {
     if (!config.target && (!config.action || !config.data)) {

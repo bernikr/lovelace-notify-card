@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 bernikr <hi@berni.kr>
+
+SPDX-License-Identifier: MIT
+-->
+
 # Notify Card for Lovelace/Home Assistant
 
 [!["Buy Me A Coffee"](https://img.shields.io/static/v1?label=donate&message=buymeacoffee&color=FFDD00&logo=buymeacoffee&style=flat-square)](https://buymeacoffee.com/bernikr)
