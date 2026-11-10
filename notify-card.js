@@ -63,12 +63,13 @@ class NotifyCard extends HTMLElement {
     // as per ha-card's default styles to maintain consistent spacing
     this.content.style.padding = hasTitle ? "0 16px 16px" : "16px";
 
-    // Remove border, shadow, and background when used inside another card (group mode)
-    if (this.config.group) {
-      this.card.style.border = "none";
-      this.card.style.boxShadow = "none";
-      this.card.style.background = "transparent";
-    }
+    // Remove border, shadow, and background when used inside another card
+    // (group mode). Assign in both directions: a card can be reconfigured
+    // without being recreated, and leaving the inline styles behind would
+    // keep it looking grouped after group is turned off.
+    this.card.style.border = this.config.group ? "none" : "";
+    this.card.style.boxShadow = this.config.group ? "none" : "";
+    this.card.style.background = this.config.group ? "transparent" : "";
 
     this.content.innerHTML = "";
 
@@ -236,7 +237,9 @@ class NotifyCard extends HTMLElement {
 
       if (typeof data === "string") {
         for (const [key, value] of Object.entries(replacement_terms)) {
-          data = data.replaceAll(key, value);
+          // A function replacement keeps the user's text literal: a string
+          // replacement would interpret $&, $' and $$ in what they typed.
+          data = data.replaceAll(key, () => value);
         }
 
         if (data.includes("{{") || data.includes("{%")) {
@@ -401,6 +404,15 @@ class NotifyCard extends HTMLElement {
       ],
       computeLabel: (schema) => labels[schema.name],
       assertConfig: (config) => {
+        // Keep this in sync with setConfig: an empty service is written by
+        // the action editor when its action is cleared, and the card would
+        // reject that config.
+        if (
+          config.send_action &&
+          !(config.send_action.perform_action ?? config.send_action.service)
+        ) {
+          throw new Error("Choose an action under Send action");
+        }
         if (!config.send_action && (config.action || config.target)) {
           throw new Error(
             "Cards using action, data and target can only be edited in YAML. Move them into send_action to use the visual editor",
